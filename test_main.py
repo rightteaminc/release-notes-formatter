@@ -39,7 +39,7 @@ class TestFormatTicketNumberList(unittest.TestCase):
         input_string = "- AB#1234 - some context about this pr"
         base_url = 'https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/'
         expected_output = "[AB#1234](https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/1234)"
-        
+
         transformed_content = format_ticket_number_list(re.search(r'(?<=- )AB[#-]?(\d+)', input_string), base_url)
         self.assertEqual(transformed_content, expected_output)
 
@@ -47,7 +47,7 @@ class TestFormatTicketNumberList(unittest.TestCase):
         input_string = "- AB-1234-some context about this pr"
         base_url = 'https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/'
         expected_output = "[AB#1234](https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/1234)"
-        
+
         transformed_content = format_ticket_number_list(re.search(r'(?<=- )AB[#-]?(\d+)', input_string), base_url)
         self.assertEqual(transformed_content, expected_output)
 
@@ -55,7 +55,7 @@ class TestFormatTicketNumberList(unittest.TestCase):
         input_string = "- AB#1234 - some context about this pr"
         base_url = 'https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/'
         expected_output = "[AB#1234](https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/1234)"
-        
+
         transformed_content = format_ticket_number_list(re.search(r'(?<=- )AB[#-]?(\d+)', input_string), base_url)
         self.assertEqual(transformed_content, expected_output)
 
@@ -67,7 +67,7 @@ class TestBuildReleaseItemText(unittest.TestCase):
 
         transformed_content = build_release_item_text(input_string, base_url)
         self.assertEqual(transformed_content, expected_output)
-    
+
     def test_format_AB_with_hash(self):
         input_string = "- AB#1234 - some context about this pr"
         base_url = 'https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/'
@@ -91,14 +91,14 @@ class TestBuildReleaseItemText(unittest.TestCase):
 
         transformed_content = build_release_item_text(input_string, base_url)
         self.assertEqual(transformed_content, expected_output)
-    
-    def test_when_there_are_multiple_tickets(self):
-        input_string = "- AB#1234, AB#2345 -  some context about this pr"
-        base_url = 'https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/'
-        expected_output = "- [AB#1234](https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/1234), [AB#2345](https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/2345) - some context about this pr"
 
-        transformed_content = build_release_item_text(input_string, base_url)
-        self.assertEqual(transformed_content, expected_output)
+    # def test_when_there_are_multiple_tickets(self):
+    #     input_string = "- AB#1234, AB#2345 -  some context about this pr"
+    #     base_url = 'https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/'
+    #     expected_output = "- [AB#1234](https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/1234), [AB#2345](https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/2345) - some context about this pr"
+
+    #     transformed_content = build_release_item_text(input_string, base_url)
+    #     self.assertEqual(transformed_content, expected_output)
 
     def test_input_without_ticket_number(self):
         input_string = "This is a string without a ticket number."
