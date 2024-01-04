@@ -1,4 +1,9 @@
 import re
+import os
+import filecmp
+import shutil
+import os
+import filecmp
 import unittest
 from main import format_ticket_number_list, build_release_item_text
 
@@ -76,6 +81,13 @@ class TestBuildReleaseItemText(unittest.TestCase):
     #     transformed_content = build_release_item_text(input_string, base_url)
     #     self.assertEqual(transformed_content, expected_output)
 
+class TestIntegration(unittest.TestCase):
+    def test_integration(self):
+        shutil.copyfile('input_mock.md', 'input.md')
+        os.system('python3 main.py')
+        self.assertTrue(filecmp.cmp('output.md', 'output_mock.md'), "Output file does not match the expected output.")
+
 if __name__ == '__main__':
     unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestFormatTicketNumberList))
     unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestBuildReleaseItemText))
+    unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestIntegration))
