@@ -100,6 +100,30 @@ class TestBuildReleaseItemText(unittest.TestCase):
         transformed_content = build_release_item_text(input_string, base_url)
         self.assertEqual(transformed_content, expected_output)
 
+    def test_input_without_ticket_number(self):
+        input_string = "This is a string without a ticket number."
+        base_url = 'https://dev.azure.com/valid-url/'
+        expected_output = input_string
+
+        transformed_content = build_release_item_text(input_string, base_url)
+        self.assertEqual(transformed_content, expected_output)
+
+    def test_ticket_number_in_unexpected_format(self):
+        input_string = "Text with TICKET-1234 not formatted."
+        base_url = 'https://dev.azure.com/valid-url/'
+        expected_output = input_string
+
+        transformed_content = build_release_item_text(input_string, base_url)
+        self.assertEqual(transformed_content, expected_output)
+
+    def test_invalid_base_url(self):
+        input_string = "- AB#1234 - context that should not get formatted."
+        base_url = 'invalid-url'
+        expected_output = input_string
+
+        transformed_content = build_release_item_text(input_string, base_url)
+        self.assertEqual(transformed_content, expected_output)
+
 if __name__ == '__main__':
     unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestFormatTicketNumberList))
     unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestBuildReleaseItemText))
