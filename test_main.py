@@ -3,6 +3,30 @@ import unittest
 from main import format_ticket_number_list, build_release_item_text
 
 class TestFormatTicketNumberList(unittest.TestCase):
+
+    def test_invalid_base_url(self):
+        input_string = "- AB#1234 - context with a ticket number."
+        base_url = 'invalid-url'
+        expected_output = input_string
+
+        transformed_content = format_ticket_number_list(re.search(r'(?<=- )AB[#-]?(\d+)', input_string), base_url)
+        self.assertEqual(transformed_content, expected_output)
+
+    def test_ticket_number_in_unexpected_format(self):
+        input_string = "This string has ticket 1234 not in expected format."
+        base_url = 'https://dev.azure.com/valid-url/'
+        expected_output = input_string
+
+        transformed_content = format_ticket_number_list(re.search(r'(?<=- )AB[#-]?(\d+)', input_string), base_url)
+        self.assertEqual(transformed_content, expected_output)
+
+    def test_input_without_ticket_number(self):
+        input_string = "This is a string without a ticket number."
+        base_url = 'https://dev.azure.com/valid-url/'
+        expected_output = input_string
+
+        transformed_content = format_ticket_number_list(re.search(r'(?<=- )AB[#-]?(\d+)', input_string), base_url)
+        self.assertEqual(transformed_content, expected_output)
     def test_format_ticket_number_list(self):
         input_string = "- AB#1234 - some context about this pr"
         base_url = 'https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/'
