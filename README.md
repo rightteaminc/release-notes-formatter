@@ -38,13 +38,13 @@ In order to use this utility, you must first clone this repository. Then:
 1. Rrom a terminal, run `python3 main.py`
 1. Observe the formatted results in `output.md`
 
-## Using the pull_commits_for_release.py script
+## Using the main.py script
 
-This script is used to pull commits for a release. It takes a release number as an argument and outputs a list of commits associated with that release.
+This script is the primary utility for formatting release notes.
 
 ### Instructions for use:
-1. From a terminal, run `python3 pull_commits_for_release.py <release_number>` where `<release_number>` is the number of the release you want to pull commits for.
-2. The script will output a list of commits associated with the specified release.
+1. From a terminal, run `python3 main.py`
+2. Observe the formatted results in `output.md`
 3. Before running the script, ensure you have Python 3 installed and are in the root directory of the repository.
 
 ## Tests
