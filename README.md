@@ -34,7 +34,7 @@ and format everything to something consistent like this:
 
 In order to use this utility, you must first clone this repository. Then: 
 
-1. Copy the release notes you wish to format into the `input.md` doc
+1. Populate `input.md` with the markdown to be translated, typically from a draft release in GitHub.
 1. Rrom a terminal, run `python3 main.py`
 1. Observe the formatted results in `output.md`
 
