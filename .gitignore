@@ -53,4 +53,8 @@ yarn-error.log*
 
 input.md
 output.md
+commits.md
 __pycache__
+
+.env
+notes.txt
