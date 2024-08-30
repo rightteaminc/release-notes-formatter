@@ -58,3 +58,4 @@ __pycache__
 
 .env
 notes.txt
+venv/

@@ -4,7 +4,7 @@ from datetime import datetime
 from collections import defaultdict
 
 repository = "rightteaminc/parallax"
-start_tag_name = "v15.5"
+start_tag_name = "v15.16"
 # next_tag_name = "v14.48.0"
 title = ''
 output_file_name = "commits.md"
