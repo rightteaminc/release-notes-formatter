@@ -38,10 +38,10 @@ def write_draft_to_file(draft, filename="input.md"):
     with open(filename, 'w') as file:
         file.write(draft['body'])
 
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-REPOSITORY = 'rightteaminc/parallax'
+github_token = os.getenv('GITHUB_TOKEN')
+repository = 'rightteaminc/parallax'
 
-draft_releases = get_draft_releases(REPOSITORY, GITHUB_TOKEN)
+draft_releases = get_draft_releases(repository, github_token)
 
 if draft_releases:
     write_draft_to_file(draft_releases[0])  # Write the first draft release to 'input.md'
