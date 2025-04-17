@@ -1,8 +1,27 @@
 # Release Notes Formatter
 
-Transforms the generated release notes output from [release-drafter](https://github.com/release-drafter/release-drafter).
+## Table of Contents
+- [What It Does](#what-it-does)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+  - [Clone the Repository](#1-clone-the-repository)
+  - [Set Up Virtual Environment](#2-set-up-virtual-environment)
+  - [GitHub CLI Setup](#3-github-cli-setup)
+- [Usage](#usage)
+  - [Format Release Notes](#format-release-notes)
+  - [Count Tags](#count-tags)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Tests](#tests)
+- [License](#licesnse)
 
-This utlity will take a markdown file that looks like this:
+A Python tool to format release notes by automatically converting AB ticket numbers into clickable links for Azure DevOps.
+
+## What It Does
+
+This utility transforms the generated release notes output from [release-drafter](https://github.com/release-drafter/release-drafter).
+
+For example, it will take a markdown file that looks like this:
 
 ```md
 ## 🐛 Bug Fixes
@@ -30,13 +49,100 @@ and format everything to something consistent like this:
 - [AB#5282](https://dev.azure.com/parallax-app/Parallax%202023/_workitems/edit/5282) - Fix Tab Submit @kcvikander (#4233)
 ```
 
+## Prerequisites
+
+- Python 3.x
+- GitHub CLI (`gh`)
+- Access to the Parallax Azure DevOps project
+
+## Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd release-notes-formatter
+```
+
+### 2. Set Up Virtual Environment
+
+```bash
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+.\venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 3. GitHub CLI Setup
+
+1. Install GitHub CLI:
+   - macOS: `brew install gh`
+   - Linux: Follow [GitHub CLI installation instructions](https://cli.github.com/manual/installation)
+   - Windows: `winget install GitHub.cli`
+
+2. Authenticate with GitHub:
+```bash
+gh auth login
+```
+Follow the prompts to complete authentication.
+
 ## Usage
 
-In order to use this utility, you must first clone this repository. Then: 
+The tool provides several commands through the Makefile:
 
-1. Copy the release notes you wish to format into the `input.md` doc
-1. Rrom a terminal, run `python3 main.py`
-1. Observe the formatted results in `output.md`
+### Format Release Notes
+
+```bash
+make release_notes
+```
+This will:
+1. Pull the most recent release draft from GitHub
+2. Format the release notes by converting AB ticket numbers to clickable links
+3. Copy the formatted content to your clipboard
+4. Paste output into GitHub release notes
+
+### Count Tags
+
+```bash
+make count_tags
+```
+This will count the number of tags created within a specified number of days.
+
+## Testing
+
+The project includes comprehensive test coverage. To run the tests:
+
+```bash
+# Run all tests
+python3 -m unittest discover
+
+# Run specific test file
+python3 -m unittest test_main.py
+python3 -m unittest test_pull_prerelease.py
+```
+
+The test suite includes:
+- Unit tests for ticket number formatting
+- Unit tests for release note building
+- Integration tests for the complete workflow
+- Tests for GitHub release draft functionality
+
+## Project Structure
+
+- `main.py`: Core functionality for formatting release notes
+- `pull_prerelease.py`: Handles fetching release drafts from GitHub
+- `count_tags.py`: Utility for counting repository tags
+- `test_main.py`: Tests for the main formatting functionality
+- `test_pull_prerelease.py`: Tests for GitHub release draft functionality
+- `Makefile`: Contains common commands for the project
+
 
 ## Tests
 
