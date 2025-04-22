@@ -1,0 +1,72 @@
+- id: '8752'
+  title: Display completed roles
+  description: "Completed Roles are not visible, and if a Completed Role happens to\
+    \ be the longest-running role on an offering, it can appear to the unaware user\
+    \ that the shaper offering bar should be trimmed, and if the user does that, they'll\
+    \ be warned that they're gonna trim an allocation, but they're gonna click past\
+    \ it because they know better, and there's probably gonna be some ramifications.\
+    \ \n \nWe can probably make the warning modal be more specific or make it add\
+    \ Completed Roles to the Included filter so they can see what they're trimming.\
+    \ \n \n \nCopied from Repro Steps when changed from Issue to Bug\nHave one role\
+    \ on a project run much longer than the rest of the offering roles \nMark the\
+    \ role completed \nObserve that black offering bar appears to have an errantly\
+    \ late end date \nDrag the offering bar back to the end of the longest visible\
+    \ role \nObserve the warning modal \nConfirm \nAdd Completed Roles to the Include\
+    \ filter \nObserve that,\n \nin accordance with prophecy,\n the Completed role's\
+    \ plans were trimmed."
+- id: '9111'
+  title: Update default Project Offerings shown on user Timesheet
+  description: "WHO: \nAs a time tracking user \nWHAT: \nI want to only see relevant\
+    \ offerings on my timesheet \nWHY: \nSo my timesheet is easy to read and use,\
+    \ and I am only looking at the projects relevant to me for the week I am entering\
+    \ time. \n \nDefault view: \nUser is assigned to project + offering for the current\
+    \ week (has plans) \nUser logged time to project + offering the last week - uncertain\
+    \ of how we can achieve this \n \nThis logic should account for not needing to\
+    \ hide rows"
+- id: '9264'
+  title: 'Design Review : Timesheet UI'
+  description: "1. Let's give the \"View current week\" a 5px of padding so it has\
+    \ space on hover of arrow.\n \n \n2. \"Search People\" text and arrow seem extra\
+    \ small\n3. Did we lose the \"Last Saved...\" Text?\n4. I haven't seen the sticky\
+    \ footer yet, but I think we want this last row to be cool gray 100 (see design)"
+- id: '9283'
+  title: Create Project - Client drop down is broken in the modal
+  description: ''
+- id: '9347'
+  title: Add user tracking events to PX Timesheet view(s)
+  description: "x\napply plans (global)\n \n \nx\napply plan (context)\n \nx\nclear\
+    \ plans (context)\n \nx\nadd note\n \nx\ndate picker\n \nx\ndate picker pages\n\
+    \ \nx\nview current week\n \nx\nchanging employee\n \nx\nclearing employee\n \n\
+    xsubmit for approval"
+- id: '9364'
+  title: 'AV Project: Advanced person search collapses irretrievably after changing
+    role parameters.'
+  description: "Changing the role filter crashes the advanced people search when triggered\
+    \ from AV:Projects. This functions as expected from the project shaper. \n \n\
+    Expectation: Changing role filter selections updates the employees returned accordingly.\
+    \ \nCopied from Repro Steps when changed from Issue to Bug\nhttps://app.getparallax.com/assignments?view=projects\n\
+    \ \nOpen a project with an unassigned role \nToggle Edit Mode on \n Click the\
+    \ + pill to add an employee \nClick Advanced Search \nClick the role filter \n\
+    Check a box for another role \nClick outside the filter to collapse it \nObserve\
+    \ that AV does not display people matching the role criteria; rather it displays\
+    \ the root AV: Project view while maintaining some of the trappings of the Advanced\
+    \ People Search"
+- id: '9387'
+  title: Unsaved changes after connecting timesheet
+  description: "Hooked up a timesheet and went to nav somewhere useful and got the\
+    \ unsaved changes prompt. \n \n \nExpectation: As there is no save button, I should\
+    \ not be prompted to save changes."
+- id: '9396'
+  title: Update Upload/Download component
+  description: ''
+- id: '9416'
+  title: 'Financial Settings: The rounding we do in core is different than the rounding
+    in insights'
+  description: ''
+- id: '9423'
+  title: Update CRM disconnect modal copy
+  description: ''
+- id: '9460'
+  title: 'Timesheet - approvals: Because of the nature of the two user interface,
+    the user can see a stale version of their timesheet between reopening and approval'
+  description: ''
