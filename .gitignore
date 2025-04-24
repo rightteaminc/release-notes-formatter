@@ -24,6 +24,7 @@
 .node_repl_history
 .npm
 .nyc_output
+.pytest_cache/
 .run
 .secrets
 .swc
@@ -60,3 +61,8 @@ __pycache__
 .env
 notes.txt
 venv/
+
+# Coverage artifacts
+.coverage
+coverage.xml
+htmlcov/

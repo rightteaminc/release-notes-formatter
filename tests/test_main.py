@@ -90,4 +90,4 @@ class TestIntegration(unittest.TestCase):
 if __name__ == '__main__':
     unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestFormatTicketNumberList))
     unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestBuildReleaseItemText))
-    unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestIntegration))
+    unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromTestCase(TestIntegration)) 

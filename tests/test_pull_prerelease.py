@@ -38,4 +38,4 @@ class TestGitHubReleases(unittest.TestCase):
 
 # Replace with the actual name of your script
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main() 
