@@ -1,41 +1,121 @@
-import unittest
-from unittest.mock import patch, mock_open
-import pull_prerelease 
+"""Tests for the GitHub release notes fetcher module."""
 
-class TestGitHubReleases(unittest.TestCase):
+import os
+import pytest
+import responses
+from pull_prerelease import get_draft_releases, write_draft_to_file, fetch_and_save_latest_draft
 
-    @patch('requests.get')
-    def test_get_draft_releases_success(self, mock_get):
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = [{'draft': True, 'body': 'Test Draft Body'}]
 
-        result = pull_prerelease.get_draft_releases('rightteaminc/parallax', 'dummy_token')
-        self.assertEqual(len(result), 1)
-        self.assertTrue(result[0]['draft'])
+@pytest.fixture
+def mock_github_response():
+    """Mock response data for GitHub API."""
+    return [
+        {
+            "id": 1,
+            "draft": True,
+            "body": "# Test Release Notes\n- Feature 1\n- Feature 2"
+        },
+        {
+            "id": 2,
+            "draft": False,
+            "body": "Published release"
+        }
+    ]
 
-    @patch('requests.get')
-    def test_get_draft_releases_failure(self, mock_get):
-        mock_get.return_value.status_code = 404
-        mock_get.return_value.text = 'Not Found'
 
-        result = pull_prerelease.get_draft_releases('rightteaminc/parallax', 'invalid_token')
-        self.assertEqual(result, [])
+@responses.activate
+def test_get_draft_releases_success(mock_github_response):
+    """Test successful fetching of draft releases."""
+    repo = "test/repo"
+    token = "fake-token"
+    url = f"https://api.github.com/repos/{repo}/releases"
+    
+    responses.add(
+        responses.GET,
+        url,
+        json=mock_github_response,
+        status=200
+    )
+    
+    drafts = get_draft_releases(repo, token)
+    assert len(drafts) == 1
+    assert drafts[0]["draft"] is True
+    assert drafts[0]["body"] == "# Test Release Notes\n- Feature 1\n- Feature 2"
 
-    @patch('requests.get')
-    def test_get_draft_releases_no_drafts(self, mock_get):
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = [{'draft': False}]
 
-        result = pull_prerelease.get_draft_releases('rightteaminc/parallax', 'dummy_token')
-        self.assertEqual(result, [])
+@responses.activate
+def test_get_draft_releases_failure():
+    """Test handling of failed API requests."""
+    repo = "test/repo"
+    token = "fake-token"
+    url = f"https://api.github.com/repos/{repo}/releases"
+    
+    responses.add(
+        responses.GET,
+        url,
+        json={"message": "Not Found"},
+        status=404
+    )
+    
+    drafts = get_draft_releases(repo, token)
+    assert len(drafts) == 0
 
-    @patch("builtins.open", new_callable=mock_open, read_data="data")
-    def test_write_draft_to_file(self, mock_file):
-        draft_release = {'body': 'Test Draft Content'}
-        pull_prerelease.write_draft_to_file(draft_release, 'test.md')
-        mock_file.assert_called_with('test.md', 'w')
-        mock_file().write.assert_called_once_with('Test Draft Content')
 
-# Replace with the actual name of your script
-if __name__ == '__main__':
-    unittest.main() 
+def test_write_draft_to_file(tmp_path):
+    """Test writing draft content to a file."""
+    test_file = tmp_path / "test_output.md"
+    test_content = {
+        "body": "# Test Content\n- Item 1\n- Item 2"
+    }
+    
+    write_draft_to_file(test_content, str(test_file))
+    
+    assert test_file.exists()
+    with open(test_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    assert content == test_content["body"]
+
+
+@responses.activate
+def test_fetch_and_save_latest_draft_success(tmp_path, mock_github_response):
+    """Test the complete flow of fetching and saving a draft."""
+    repo = "test/repo"
+    token = "fake-token"
+    output_file = tmp_path / "output.md"
+    url = f"https://api.github.com/repos/{repo}/releases"
+    
+    responses.add(
+        responses.GET,
+        url,
+        json=mock_github_response,
+        status=200
+    )
+    
+    result = fetch_and_save_latest_draft(repo, token, str(output_file))
+    
+    assert result is True
+    assert output_file.exists()
+    with open(output_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    assert content == mock_github_response[0]["body"]
+
+
+@responses.activate
+def test_fetch_and_save_latest_draft_no_drafts(tmp_path):
+    """Test handling when no draft releases are found."""
+    repo = "test/repo"
+    token = "fake-token"
+    output_file = tmp_path / "output.md"
+    url = f"https://api.github.com/repos/{repo}/releases"
+    
+    responses.add(
+        responses.GET,
+        url,
+        json=[{"draft": False, "body": "Published"}],
+        status=200
+    )
+    
+    result = fetch_and_save_latest_draft(repo, token, str(output_file))
+    
+    assert result is False
+    assert not output_file.exists() 

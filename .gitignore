@@ -54,7 +54,6 @@ yarn-error.log*
 
 input.md
 output.md
-commits.md
 tickets.yml
 __pycache__
 
@@ -66,3 +65,9 @@ venv/
 .coverage
 coverage.xml
 htmlcov/
+
+# Python package artifacts
+*.egg-info/
+*.egg
+dist/
+build/
