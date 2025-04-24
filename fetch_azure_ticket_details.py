@@ -10,7 +10,7 @@ load_dotenv()
 
 organization = os.environ["AZURE_ORG"]
 project = os.environ["AZURE_PROJECT"]
-pat = "6FZv7RzCP0TRSOz5wE4woFRVD2oU27zToNYmgPHyznX4qSPY8ApnJQQJ99BDACAAAAAFd05OAAASAZDONWhc"
+pat = os.environ["AZURE_PAT"]
 
 
 def extract_ticket_ids_from_markdown(filepath: str) -> list[int]:

@@ -54,6 +54,7 @@ yarn-error.log*
 input.md
 output.md
 commits.md
+tickets.yml
 __pycache__
 
 .env
