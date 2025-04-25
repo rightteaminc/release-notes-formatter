@@ -5,9 +5,14 @@ This module tests the functionality for fetching and processing both Azure and n
 """
 
 import pytest
+import os
 from unittest.mock import patch, Mock
 from pathlib import Path
 import yaml
+
+os.environ["AZURE_ORG"] = "dummy-org"
+os.environ["AZURE_PROJECT"] = "dummy-project"
+os.environ["AZURE_PAT"] = "dummy-pat"
 
 from release_notes.models import ReleaseNoteEntry, EntryType
 from fetch_azure_ticket_details import parse_release_notes, fetch_work_items

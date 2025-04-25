@@ -134,6 +134,49 @@ The test suite includes:
 - Integration tests for the complete workflow
 - Tests for GitHub release draft functionality
 
+## Continuous Integration
+
+This project uses GitHub Actions for CI. The workflow runs tests automatically on pushes to main branch.
+
+### Environment Variables
+
+The tests are designed to run without real API credentials. Environment variables are handled in two ways:
+
+1. **In CI workflow** - We set workflow-related dummy values in the GitHub Actions workflow:
+   ```yaml
+   env:
+     GITHUB_TOKEN: "dummy-token"  
+     GITHUB_REPOSITORY: "owner/repo"
+   ```
+
+2. **In test files** - For modules that access environment variables at import time (like Azure credentials), we set them directly in the test files:
+   ```python
+   # At the top of tests/test_fetch_azure_ticket_details.py
+   import os
+   
+   # Set environment variables before importing the module
+   os.environ["AZURE_ORG"] = "dummy-org"
+   os.environ["AZURE_PROJECT"] = "dummy-project"
+   os.environ["AZURE_PAT"] = "dummy-pat"
+   
+   # Now import the module that needs these environment variables
+   from fetch_azure_ticket_details import parse_release_notes, fetch_work_items
+   ```
+
+If you need to run the actual application (not just tests) in CI, you'll need to add real credentials using GitHub Secrets.
+
+### Running the CI Workflow Locally
+
+To run the same tests locally as in CI:
+
+```bash
+# You don't need to manually set the Azure environment variables
+# as they're automatically set in the test files
+
+# Run tests
+make test
+```
+
 ## Project Structure
 
 - `main.py`: Core functionality for formatting release notes
