@@ -15,7 +15,7 @@ def parser():
 @pytest.fixture
 def sample_release_notes():
     """Path to the sample release notes markdown file."""
-    return Path(__file__).parent / "fixtures" / "sample_release_notes.md"
+    return Path(__file__).parent / "fixtures" / "sample_ui_release_notes.md"
 
 @pytest.fixture
 def sample_azure_ticket_entry():

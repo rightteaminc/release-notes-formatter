@@ -12,7 +12,7 @@ from release_notes.exceptions import InvalidEntryFormatError
 
 @pytest.fixture
 def sample_release_notes():
-    return Path(__file__).parent / "fixtures" / "sample_release_notes.md"
+    return Path(__file__).parent / "fixtures" / "sample_ui_release_notes.md"
 
 @pytest.fixture
 def parser():
