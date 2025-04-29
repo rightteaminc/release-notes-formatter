@@ -28,4 +28,21 @@ def test_release_note_entry_optional_fields():
         entry_type=EntryType.CUSTOM
     )
     assert entry.ticket_id is None
-    assert entry.title is None 
+    assert entry.title is None
+
+def test_load_repositories_from_yaml(tmp_path):
+    from release_notes.file_utils import load_repositories_from_yaml
+    yaml_content = """
+repositories:
+  - repo1
+  - repo2
+"""
+    yaml_file = tmp_path / "repos.yml"
+    yaml_file.write_text(yaml_content)
+    repos = load_repositories_from_yaml(str(yaml_file))
+    assert repos == ["repo1", "repo2"]
+
+    # Test with missing 'repositories' key
+    yaml_file.write_text("other_key: []")
+    repos = load_repositories_from_yaml(str(yaml_file))
+    assert repos == [] 

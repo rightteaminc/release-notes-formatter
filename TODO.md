@@ -1,39 +1,31 @@
-- [ ] **Focus Only on "Work Items"**
+## Aggregate and Process Release Notes from All Output Files
 
-  - [ ] Only parse and process the "Work Items" section from the release notes (see `sample_be_release_notes.md` for examples).
-  - [ ] Ignore all other sections (e.g., "Pull Requests").
+- [x] **Read All Files in `raw_release_notes/`**
 
-- [ ] **Extract Only Required Fields**
+  - [x] List and open all output files in the `raw_release_notes` directory.
+  - [x] Parse each file to extract all relevant entries (e.g., work items/ticket IDs).
+  - [x] Combine all extracted ticket IDs into a single list, ensuring no duplicates.
 
-  - [ ] For each work item line (e.g., `- [9176](...) - Create new Pagination Model...`), extract:
-    - The work item ID (e.g., `9176`)
-    - The title/description (e.g., `Create new Pagination Model...`)
-  - [ ] Do not use the URL in the markdown link.
+- [x] **Update Ticket Fetching Workflow**
 
-- [ ] **Use Differentiators for Format Selection**
+  - [x] Modify `fetch_azure_ticket_details.py` to accept a list of ticket IDs as input (from all files, not just one).
+  - [x] Optionally, allow passing a directory path to automatically aggregate ticket IDs from all files within.
+  - [x] Fetch details for all unique ticket IDs.
 
-  - [ ] In `format_prs_for_release.py`, add a CLI flag or parameter to specify the format/source (e.g., `--type BE` or `--type UI`).
-  - [ ] Use this flag to select the correct parsing logic.
+- [x] **CLI/Script Integration**
 
-- [ ] **Leverage and Extend Existing Parser Infrastructure**
-
-  - [ ] In `release_notes/models.py`, add a new `EntryType` (e.g., `WORK_ITEM`).
-  - [ ] In `release_notes/parser.py`, add a new parsing pattern for work item lines.
-  - [ ] Ensure the parser can be invoked to only process the "Work Items" section.
-
-- [ ] **Consider a Factory/Strategy Pattern for Parser Selection**
-
-  - [ ] Implement a factory or strategy pattern (could be a function or class in `release_notes/parser.py` or a new file) to select the appropriate parser based on the format.
-
-- [ ] **Integrate with `format_prs_for_release.py`**
-
-  - [ ] Update the script to accept the new parameter/flag.
-  - [ ] Use the parser to extract work items from BE release notes.
-  - [ ] Output the extracted work items in the desired format.
+  - [x] Create or update an orchestrator script to:
+    - Read all files in `raw_release_notes/`
+    - Aggregate ticket IDs
+    - Call `fetch_azure_ticket_details.py` with the full list
+  - [x] Ensure the workflow is easy to run from the command line.
 
 - [ ] **Testing**
 
-  - [ ] Add or update tests in `tests/` to ensure:
-    - Only "Work Items" are parsed.
-    - Both the work item ID and title/description are correctly extracted.
-    - The correct parser is selected based on the differentiator.
+  - [x] Test that all files in `raw_release_notes/` are read and parsed.
+  - [x] Test that ticket IDs are correctly aggregated and deduplicated.
+  - [x] Test that `fetch_azure_ticket_details.py` fetches details for all tickets.
+
+- [ ] **Documentation**
+
+  - [ ] Update README/Docs to document the new workflow and how to run the updated process.

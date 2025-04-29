@@ -71,3 +71,5 @@ htmlcov/
 *.egg
 dist/
 build/
+
+raw_release_notes/

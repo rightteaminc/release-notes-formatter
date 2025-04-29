@@ -1,0 +1,5 @@
+repositories:
+  - repo: rightteaminc/parallax
+    name: parallax-ui
+  - repo: rightteaminc/parallax-server
+    name: parallax-server

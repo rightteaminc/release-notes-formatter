@@ -10,6 +10,7 @@
 - [Usage](#usage)
   - [Format Release Notes](#format-release-notes)
   - [Count Tags](#count-tags)
+  - [Fetch Azure Ticket Details from All Release Notes](#fetch-azure-ticket-details-from-all-release-notes)
 - [Testing](#testing)
 - [Project Structure](#project-structure)
 - [Tests](#tests)
@@ -115,17 +116,33 @@ make count_tags
 ```
 This will count the number of tags created within a specified number of days.
 
+### Fetch Azure Ticket Details from All Release Notes
+
+To aggregate all ticket IDs from every `output.md` in `raw_release_notes/`, fetch details for each ticket from Azure DevOps, and write the results to `tickets.yml`, use:
+
+```bash
+make format_notes
+```
+
+This will:
+1. Pull and format the most recent release notes
+2. Aggregate all ticket IDs from all output files in `raw_release_notes/`
+3. Fetch Azure DevOps details for each ticket
+4. Write the results to `tickets.yml`
+
+**Note:**
+- The parser is strict: malformed Azure ticket lines (e.g., missing or non-numeric IDs) will cause errors and must be fixed in the source markdown.
+
 ## Testing
 
-The project includes comprehensive test coverage. To run the tests:
+The project includes comprehensive test coverage using `pytest`. To run the tests, use the Makefile:
 
 ```bash
 # Run all tests
-python3 -m unittest discover
+make test
 
-# Run specific test file
-python3 -m unittest test_main.py
-python3 -m unittest test_pull_prerelease.py
+# Run tests with coverage report
+make test_coverage
 ```
 
 The test suite includes:
@@ -182,6 +199,8 @@ make test
 - `main.py`: Core functionality for formatting release notes
 - `pull_prerelease.py`: Handles fetching release drafts from GitHub
 - `count_tags.py`: Utility for counting repository tags
+- `aggregate_ticket_ids.py`: Aggregates all ticket IDs from all output files in `raw_release_notes/`
+- `fetch_azure_ticket_details.py`: Fetches Azure ticket details for all aggregated ticket IDs and writes to `tickets.yml`
 - `test_main.py`: Tests for the main formatting functionality
 - `test_pull_prerelease.py`: Tests for GitHub release draft functionality
 - `Makefile`: Contains common commands for the project
@@ -191,7 +210,7 @@ make test
 
 This project includes unit tests found in `test_main.py`. Any changes, additions, or removals in `main.py` must be accounted for in the tests. 
 
-Tests can be run using the following command: `python -m unittest test_main.py`
+Tests can be run using the Makefile as described above.
 
 ## Licesnse
 

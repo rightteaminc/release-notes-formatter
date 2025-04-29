@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
+      AZURE_ORG: 'dummy'
+      AZURE_PAT: 'threeve'
+      AZURE_PROJECT: 'dummy-project'
       GITHUB_TOKEN: "dummy-token"
       GITHUB_REPOSITORY: "owner/repo"
     

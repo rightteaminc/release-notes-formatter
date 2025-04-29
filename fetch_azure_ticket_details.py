@@ -16,28 +16,13 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from release_notes.parser import ReleaseNoteParser
 from release_notes.models import EntryType, ReleaseNoteEntry
+from aggregate_ticket_ids import get_all_ticket_ids
 
 load_dotenv()
 
 organization = os.environ["AZURE_ORG"]
 project = os.environ["AZURE_PROJECT"]
 pat = os.environ["AZURE_PAT"]
-
-
-def parse_release_notes(filepath: str) -> List[ReleaseNoteEntry]:
-    """Parse release notes and extract all entries with their metadata.
-    
-    Args:
-        filepath: Path to the markdown file to parse.
-        
-    Returns:
-        A list of ReleaseNoteEntry objects for all entry types.
-        
-    Raises:
-        FileNotFoundError: If the specified file doesn't exist.
-    """
-    parser = ReleaseNoteParser()
-    return parser.parse_file(filepath)
 
 
 def fetch_work_item(work_item_id: str) -> Dict:
@@ -73,39 +58,30 @@ def fetch_work_item(work_item_id: str) -> Dict:
     }
 
 
-def fetch_work_items(entries: List[ReleaseNoteEntry]) -> List[Dict]:
-    """Process all entries and fetch Azure details where applicable.
+def fetch_work_items(ticket_ids: List[int]) -> List[Dict]:
+    """Fetch Azure details for all ticket IDs.
     
     Args:
-        entries: List of ReleaseNoteEntry objects of any type.
+        ticket_ids: List of ticket IDs to fetch.
         
     Returns:
         List of dictionaries containing complete entry details.
     """
     all_entries = []
 
-    for entry in entries:
-        entry_dict = asdict(entry)
-        entry_dict["entry_type"] = entry_dict["entry_type"].value  
-        
-        if entry.entry_type == EntryType.AZURE_TICKET and entry.ticket_id is not None:
-            print(f"Fetching work item {entry.ticket_id}...")
-            azure_data = fetch_work_item(str(entry.ticket_id))
-            entry_dict.update({
-                "azure_title": azure_data["title"],
-                "azure_description": azure_data["description"]
-            })
-        
-        all_entries.append(entry_dict)
+    for ticket_id in ticket_ids:
+        print(f"Fetching work item {ticket_id}...")
+        azure_data = fetch_work_item(str(ticket_id))
+        all_entries.append(azure_data)
 
     return all_entries
 
 
 if __name__ == "__main__":
     output_filename = "tickets.yml"
-    entries = parse_release_notes("output.md")
-    all_entries = fetch_work_items(entries)
-    all_entries.sort(key=lambda x: x.get("ticket_id", 0) or 0)
+    ticket_ids = get_all_ticket_ids()
+    all_entries = fetch_work_items(ticket_ids)
+    all_entries.sort(key=lambda x: int(x.get("id", 0)))
     
     with open(output_filename, "w", encoding="utf-8") as f:
         yaml.dump(all_entries, f, sort_keys=False, allow_unicode=True)

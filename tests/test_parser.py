@@ -21,8 +21,6 @@ def parser():
 def test_parse_sections(parser, sample_release_notes):
     """Test that all sections are correctly identified from the markdown file."""
     entries = parser.parse_file(sample_release_notes)
-    
-    # Get unique sections from entries
     sections = {entry.section for entry in entries}
     
     assert sections == {
@@ -36,7 +34,6 @@ def test_azure_ticket_extraction(parser, sample_release_notes):
     """Test that Azure ticket IDs are correctly extracted."""
     entries = parser.parse_file(sample_release_notes)
     
-    # Get all unique Azure ticket IDs
     ticket_ids = {
         entry.ticket_id 
         for entry in entries 
@@ -49,14 +46,12 @@ def test_duplicate_entries(parser, sample_release_notes):
     """Test that duplicate entries are properly handled and appear in multiple sections."""
     entries = parser.parse_file(sample_release_notes)
     
-    # Find entries for ticket 9396 (appears in Enhancements and Requires Feature Flag)
     ticket_9396_entries = [
         entry for entry in entries 
         if entry.entry_type == EntryType.AZURE_TICKET 
         and entry.ticket_id == 9396
     ]
     
-    # Should appear in both Enhancements and Requires Feature Flag
     sections_for_9396 = {entry.section for entry in ticket_9396_entries}
     assert sections_for_9396 == {"🏷 Enhancements", "Requires Feature Flag"}
     assert len(ticket_9396_entries) == 2
@@ -65,7 +60,6 @@ def test_non_ticket_entries(parser, sample_release_notes):
     """Test that non-ticket entries are properly parsed."""
     entries = parser.parse_file(sample_release_notes)
     
-    # Find dependency entries
     dependency_entries = [
         entry for entry in entries
         if entry.section == "🧩 Dependencies"
@@ -85,7 +79,6 @@ def test_entry_attributes(parser, sample_release_notes):
     """Test that entries contain all expected attributes."""
     entries = parser.parse_file(sample_release_notes)
     
-    # Find a specific Azure ticket entry
     timesheet_entry = next(
         entry for entry in entries
         if entry.entry_type == EntryType.AZURE_TICKET
@@ -108,6 +101,7 @@ def test_entry_attributes(parser, sample_release_notes):
 def test_invalid_azure_entries(invalid_entry):
     """Test that invalid Azure ticket entries raise appropriate errors."""
     parser = ReleaseNoteParser()
+
     with pytest.raises(InvalidEntryFormatError):
         parser.parse_line(invalid_entry)
 
@@ -119,6 +113,7 @@ def test_invalid_azure_entries(invalid_entry):
 def test_invalid_dependency_entries(invalid_entry):
     """Test that invalid dependency entries raise appropriate errors."""
     parser = ReleaseNoteParser()
+
     with pytest.raises(InvalidEntryFormatError):
         parser.parse_line(invalid_entry)
 
@@ -137,6 +132,11 @@ def test_invalid_dependency_entries(invalid_entry):
         "- custom/change @user (#5678)",
         EntryType.CUSTOM,
         {"title": "custom/change", "author": "user", "pr_number": "5678"}
+    ),
+    (
+        "- [1234](https://dev.azure.com/...) - Create new Pagination Model in the Public API Project",
+        EntryType.WORK_ITEM,
+        {"ticket_id": 1234, "title": "Create new Pagination Model in the Public API Project"}
     ),
 ])
 def test_entry_variations(entry, expected_type, expected_attrs):
@@ -176,7 +176,6 @@ def test_github_style_author_links(parser, sample_release_notes):
     """Test that GitHub-style author links are properly parsed."""
     entries = parser.parse_file(sample_release_notes)
     
-    # Find the renovate[bot] entry from the sample file
     renovate_entry = next(
         entry for entry in entries
         if entry.author == "renovate[bot]"
@@ -185,7 +184,6 @@ def test_github_style_author_links(parser, sample_release_notes):
     assert renovate_entry.entry_type == EntryType.DEPENDENCY_UPDATE
     assert renovate_entry.title == "Update all non-major dependencies"
     
-    # Test additional GitHub-style links
     additional_entries = [
         "- [AB#1234](...) - Test @[developer](https://github.com/developer) (#100)",
         "- Custom change @[designer](https://github.com/designer) (#102)"
@@ -204,20 +202,19 @@ def test_smart_dependency_detection(parser, sample_release_notes):
     """Test that dependency-related entries are properly categorized."""
     entries = parser.parse_file(sample_release_notes)
     
-    # Get all dependency entries
     dependency_entries = [
         entry for entry in entries
         if entry.entry_type == EntryType.DEPENDENCY_UPDATE
     ]
     
-    # Verify the known dependency entries from sample file
     assert len(dependency_entries) == 4
+
     titles = {entry.title for entry in dependency_entries}
+    
     assert "dependencies/remove-auto-sizer-types" in titles
     assert "Update all non-major dependencies" in titles
     assert "removes deprecated dependencies" in titles
     
-    # Test additional dependency-related entries
     additional_entries = [
         "- Update package versions @maintainer (#101)",
         "- Fix dependencies issue @developer (#102)",
@@ -228,7 +225,176 @@ def test_smart_dependency_detection(parser, sample_release_notes):
     
     assert all(results), "All entries should be parsed successfully"
     assert [r.entry_type for r in results] == [
-        EntryType.DEPENDENCY_UPDATE,  # Contains "Update"
-        EntryType.DEPENDENCY_UPDATE,  # Contains "dependencies"
-        EntryType.CUSTOM             # No dependency-related keywords
-    ] 
+        EntryType.DEPENDENCY_UPDATE,   # Contains "Update"
+        EntryType.DEPENDENCY_UPDATE,   # Contains "dependencies"
+        EntryType.CUSTOM               # No dependency-related keywords
+    ]
+
+def test_parse_file_with_be_work_items(tmp_path):
+    """Test parsing a file with BE work item entries."""
+    content = """
+## Work Items
+- [9176](https://dev.azure.com/...) - Create new Pagination Model in the Public API Project
+- [9569](https://dev.azure.com/...) - Public Clients Endpoints returning 500 responses
+    """
+
+    filepath = tmp_path / "be_work_items.md"
+
+    filepath.write_text(content)
+    
+    parser = ReleaseNoteParser()
+    entries = parser.parse_file(str(filepath))
+
+    assert len(entries) == 2
+    assert all(e.entry_type == EntryType.WORK_ITEM for e in entries)
+    assert entries[0].ticket_id == 9176
+    assert entries[0].title == "Create new Pagination Model in the Public API Project"
+    assert entries[1].ticket_id == 9569
+    assert entries[1].title == "Public Clients Endpoints returning 500 responses"
+
+def test_parse_file_with_blank_lines(tmp_path):
+    """Test parse_file with a file containing only blank lines."""
+    content = """
+    
+    
+    """
+    
+    filepath = tmp_path / "blank_lines.md"
+    
+    filepath.write_text(content)
+    
+    parser = ReleaseNoteParser()
+    entries = parser.parse_file(str(filepath))
+
+    assert entries == []
+
+def test_parse_file_with_only_section_headers(tmp_path):
+    """Test parse_file with a file containing only section headers."""
+    content = """
+    ## Section 1
+    ## Section 2
+    """
+
+    filepath = tmp_path / "only_sections.md"
+    
+    filepath.write_text(content)
+    
+    parser = ReleaseNoteParser()
+    entries = parser.parse_file(str(filepath))
+    
+    assert entries == []
+
+def test_parse_file_with_only_malformed_lines(tmp_path):
+    """Test parse_file with a file containing only malformed lines."""
+    content = """
+    - This is not a valid entry
+    - [AB#](...) - Missing ticket ID @user (#123)
+    - [] - Empty ticket @user (#123)
+    """
+
+    filepath = tmp_path / "malformed_lines.md"
+    
+    filepath.write_text(content)
+    
+    parser = ReleaseNoteParser()
+    entries = parser.parse_file(str(filepath))
+    assert entries == []
+
+def test_parse_file_with_dependency_section(tmp_path):
+    """Test parse_file with a dependency section and a dependency entry."""
+    content = """
+    ## 🧩 Dependencies
+    - Update all non-major dependencies @renovate[bot] (#5678)
+    """
+
+    filepath = tmp_path / "dependency_section.md"
+    
+    filepath.write_text(content)
+
+    parser = ReleaseNoteParser()
+    entries = parser.parse_file(str(filepath))
+    
+    assert len(entries) == 1
+    assert entries[0].entry_type == EntryType.DEPENDENCY_UPDATE
+    assert entries[0].section == "🧩 Dependencies"
+
+def test_invalid_non_azure_entry():
+    """Test that a non-azure entry with missing PR number raises InvalidEntryFormatError."""
+    
+    parser = ReleaseNoteParser()
+    
+    with pytest.raises(InvalidEntryFormatError):
+        parser.parse_line("- custom/change @user ()")
+
+def test_extract_author_renovate_bot():
+    parser = ReleaseNoteParser()
+    
+    import re
+    
+    line = "- Update all non-major dependencies @[renovate[bot]](https://github.com/apps/renovate) (#1234)"
+    pattern = re.compile(r"- (.*?) @(\[renovate\[bot\]\]\(https://github.com/apps/renovate\)) \(#(\d+)\)")
+    match = pattern.match(line)
+    author = parser._extract_author(match, author_group_start=2)
+    
+    assert author == "renovate[bot]"
+
+def test_extract_author_markdown_link():
+    parser = ReleaseNoteParser()
+
+    
+    import re
+    
+    line = "- Custom change @[user](https://github.com/user) (#1234)"
+    pattern = re.compile(r"- (.*?) @\[(.*?)\]\(.*?\) \(#(\d+)\)")
+    match = pattern.match(line)
+    author = parser._extract_author(match, author_group_start=2)
+    
+    assert author == "user"
+
+def test_create_azure_entry_index_error():
+    parser = ReleaseNoteParser()
+    
+    import re
+    
+    # Missing PR number group
+    line = "- [AB#1234](...) - Test @user"
+    pattern = re.compile(r"- \[AB#(\d+)\]\(.*?\) - (.*?) @(\S+)")
+    match = pattern.match(line)
+    
+    try:
+        parser._create_azure_entry(line, match)
+    except Exception as e:
+        assert isinstance(e, InvalidEntryFormatError)
+
+def test_create_non_azure_entry_index_error():
+    parser = ReleaseNoteParser()
+
+    import re
+    
+    # Missing PR number group
+    line = "- Custom change @user"
+    pattern = re.compile(r"- (.*?) @(\S+)")
+    match = pattern.match(line)
+    
+    try:
+        parser._create_non_azure_entry(line, match)
+    except Exception as e:
+        assert isinstance(e, InvalidEntryFormatError)
+
+def test_dependency_entry_in_non_dependency_section(tmp_path):
+    content = """
+    ## 🏷 Enhancements
+    - Update all non-major dependencies @renovate[bot] (#5678)
+    """
+
+    filepath = tmp_path / "non_dep_section.md"
+    
+    filepath.write_text(content)
+    
+    parser = ReleaseNoteParser()
+    entries = parser.parse_file(str(filepath))
+    
+    assert len(entries) == 1
+    # Should be marked as dependency due to keyword, not section
+    assert entries[0].entry_type == EntryType.DEPENDENCY_UPDATE
+    assert entries[0].section == "🏷 Enhancements" 

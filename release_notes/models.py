@@ -13,6 +13,7 @@ class EntryType(Enum):
     AZURE_TICKET = "azure_ticket"
     DEPENDENCY_UPDATE = "dependency_update"
     CUSTOM = "custom"
+    WORK_ITEM = "work_item"
 
 @dataclass
 class ReleaseNoteEntry:

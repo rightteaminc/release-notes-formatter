@@ -79,43 +79,57 @@ def test_write_draft_to_file(tmp_path):
 @responses.activate
 def test_fetch_and_save_latest_draft_success(tmp_path, mock_github_response):
     """Test the complete flow of fetching and saving a draft."""
-    repo = "test/repo"
+    repo_obj = {"repo": "test/repo", "name": "test-repo"}
     token = "fake-token"
-    output_file = tmp_path / "output.md"
-    url = f"https://api.github.com/repos/{repo}/releases"
-    
+    url = f"https://api.github.com/repos/{repo_obj['repo']}/releases"
+
     responses.add(
         responses.GET,
         url,
         json=mock_github_response,
         status=200
     )
-    
-    result = fetch_and_save_latest_draft(repo, token, str(output_file))
-    
+
+    repo_dir = tmp_path / "test-repo"
+    repo_dir.mkdir()
+
+    result = fetch_and_save_latest_draft(repo_obj, token, str(tmp_path))
+
+    input_file = tmp_path / "test-repo" / "input.md"
     assert result is True
-    assert output_file.exists()
-    with open(output_file, 'r', encoding='utf-8') as f:
+    assert input_file.exists()
+    
+    with open(input_file, 'r', encoding='utf-8') as f:
         content = f.read()
+    
     assert content == mock_github_response[0]["body"]
 
 
 @responses.activate
 def test_fetch_and_save_latest_draft_no_drafts(tmp_path):
-    """Test handling when no draft releases are found."""
-    repo = "test/repo"
+    """Test handling when no draft releases are found, but a non-draft release is present."""
+    repo_obj = {"repo": "test/repo", "name": "test-repo"}
     token = "fake-token"
-    output_file = tmp_path / "output.md"
-    url = f"https://api.github.com/repos/{repo}/releases"
-    
+    url = f"https://api.github.com/repos/{repo_obj['repo']}/releases"
+
     responses.add(
         responses.GET,
         url,
         json=[{"draft": False, "body": "Published"}],
         status=200
     )
+
+    repo_dir = tmp_path / "test-repo"
+    repo_dir.mkdir()
+
+    result = fetch_and_save_latest_draft(repo_obj, token, str(tmp_path))
+
+    input_file = tmp_path / "test-repo" / "input.md"
     
-    result = fetch_and_save_latest_draft(repo, token, str(output_file))
+    assert result is True
+    assert input_file.exists()
     
-    assert result is False
-    assert not output_file.exists() 
+    with open(input_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    assert content == "Published" 
